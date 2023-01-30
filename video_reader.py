@@ -1,4 +1,5 @@
 import os
+from os.path import exists
 
 import cv2
 from timecode import Timecode
@@ -8,20 +9,20 @@ credits_start_time = "01:40:37:00"
 
 
 # TODO: solve issue with properties to get the frame count and being able to extract all picture from credits
-def extract_frame(path, start):
+def extract_frame(path, start, output="frames"):
     if not os.path.exists(path):
         print(f"{path} do not exist")
         return
     cap = cv2.VideoCapture(path)  # video_name is the video being called
     number_of_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # Need to iter until reach the end
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
     tc1 = Timecode(fps, start)
     while tc1.frames < number_of_frames:
+        path = f'{output}/frame_{str(tc1.frames)}.jpg'
         cap.set(1, tc1.frames)  # Where frame_no is the frame you want
         ret, frame = cap.read()  # Read the frame
-        cv2.imwrite('frames/frame_' + str(tc1.frames) + '.jpg', frame)
+        if not exists(path):
+            cv2.imwrite(f'{output}/frame_{str(tc1.frames)}.jpg', frame)
         tc1.frames = tc1.frames + int(fps)
 
 
