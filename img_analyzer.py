@@ -7,6 +7,8 @@ from PIL import Image
 from nltk import word_tokenize
 from typing import Dict, Set
 
+from paddleocr import PaddleOCR
+
 # To find conf for tesseract:
 # tesseract --help-oem
 # tesseract --help-psm
@@ -67,6 +69,15 @@ def extract_with_binary(path, psm=11):
         f.write(txt)
 
 
+def paddleocr(path):
+    ocr = PaddleOCR(lang='en')  # need to run only once to load model into memory
+    result = ocr.ocr(path, det=False, cls=True)
+    for idx in range(len(result)):
+        res = result[idx]
+        for line in res:
+            print(line)
+
+
 def ocr(path, psm=11):
     # Grayscale, Gaussian blur, Otsu's threshold
     image = cv2.imread(path)
@@ -86,7 +97,8 @@ def ocr(path, psm=11):
 
 
 if __name__ == '__main__':
-    print(pytesseract.image_to_string(cv2.imread('frames/frame_144889.jpg')))
-    process('frames/frame_144889.jpg', 1)
-    extract_with_binary('frames/frame_144889.jpg', 1)
-    ocr('frames/frame_144889.jpg', 1)
+    #print(pytesseract.image_to_string(cv2.imread('frames/frame_144889.jpg')))
+    #process('frames/frame_144889.jpg', 1)
+    #extract_with_binary('frames/frame_144889.jpg', 1)
+    #ocr('frames/frame_144889.jpg', 1)
+    paddleocr('frames/frame_144889.jpg')
